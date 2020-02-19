@@ -9,6 +9,8 @@ import subprocess
 from pathlib import Path
 from pprint import pprint
 import pickle
+import operator
+
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +55,7 @@ class Side:
 
         if self.cards:
             string = f"{string} [{', '.join(self.cards)}]"
-        return string
+        return f"{self.__class__.__name__} {string}"
 
     def __eq__(self, die):
         return hash(self) == hash(die)
@@ -85,58 +87,39 @@ class Side:
 
 
 class Attacker(Side):
+    def recalc(self, attacker, defender, comparator=operator.le):
+        attacker_wins = comparator(attacker.total(), defender.total())
+        winner, loser = (attacker, defender) if attacker_wins else (defender, attacker)
+
+        return winner, loser
+
     def attack(self, defender):
         attacker = self
 
         logger.debug(f"{attacker} attacking {defender}")
         attacker.roll()
         defender.roll()
-        attacker_initial = attacker.total()
-        defender_initial = defender.total()
-        attacker_wins = attacker_initial <= defender_initial
+        winner, loser = self.recalc(attacker, defender)
 
-        if attacker_wins:
-            winner = attacker
-            loser = defender
-        else:
-            winner = defender
-            loser = attacker
-
-        logger.debug(f"{attacker_initial=} vs. {defender_initial=}")
+        logger.debug(f"{winner=} vs. {loser=}")
 
         # If the LOSER holds Relentless, they can re-roll
         # We assume that the loser will ALWAYS do this, and that the winner
         # NEVER will
-        # This happens BEFORE Cruel!
         if "relentless" in loser.cards:
-            prev_loser_str = str(loser)
-            loser.roll()
-            logger.debug(f"Loser {prev_loser_str} re-roll to {loser}")
-
             prev_winner = winner
-            attacker_wins = attacker.total() <= defender.total()
-            if attacker_wins:
-                winner = attacker
-                loser = defender
-            else:
-                winner = defender
-                loser = attacker
+            loser.roll()
+            winner, loser = self.recalc(attacker, defender)
             if prev_winner != winner:
                 logger.debug("Upset due to Relentless!")
 
+        # If the ATTACKER holds Scrappy, they can re-roll
+        # We assume that, if they lose, they will ALWAYS do this, and that
+        # they never will if they win
         if loser == attacker and "scrappy" in attacker.cards:
-            prev_loser_str = str(loser)
-            loser.roll()
-            logger.debug(f"Loser {prev_loser_str} re-roll to {loser}")
-
             prev_winner = winner
-            attacker_wins = attacker.total() <= defender.total()
-            if attacker_wins:
-                winner = attacker
-                loser = defender
-            else:
-                winner = defender
-                loser = attacker
+            loser.roll()
+            winner, loser = self.recalc(attacker, defender)
             if prev_winner != winner:
                 logger.debug("Upset due to Scrappy!")
 
@@ -144,36 +127,23 @@ class Attacker(Side):
         # We assume that they will ALWAYS do this, and that the LOSER will
         # never do this
         if "cruel" in loser.cards:
-            prev_winner_str = str(winner)
-            winner.roll()
-            logger.debug(f"Winner {prev_winner_str} re-roll to {winner}")
-
             prev_winner = winner
-            attacker_wins = attacker.total() <= defender.total()
-            if attacker_wins:
-                winner = attacker
-                loser = defender
-            else:
-                winner = defender
-                loser = attacker
+            winner.roll()
+            winner, loser = self.recalc(attacker, defender)
             if prev_winner != winner:
                 logger.debug("Upset due to Relentless!")
 
+        # If the DEFENDER holds Stubborn, then they break ties
         if loser == defender and "stubborn" in defender.cards:
-            attacker_total = attacker.total()
-            defender_total = defender.total()
-            attacker_wins = attacker_total < defender_total
             prev_winner = winner
-            if attacker_wins:
-                winner = attacker
-                loser = defender
-            else:
-                winner = defender
-                loser = attacker
+            # So, instead of the attacker winning if it is LESS THAN OR
+            # EQUAL TO, it only wins if it is strictly LESS THAN the defender
+            # total
+            winner, loser = self.recalc(attacker, defender, comparator=operator.lt)
             if prev_winner != winner:
                 logger.debug("Upset due to Stubborn!")
 
-        return attacker_wins
+        return winner == attacker
 
 
 class Defender(Side):
@@ -301,8 +271,7 @@ def main():
         attacker.reset()
         defender.reset()
         print(
-            f"Attacker <{attacker}> wins against defender "
-            f"<{defender}> "
+            f"<{attacker}> wins against <{defender}> "
             f"{attacker_win_ratio:.2%} of the time (over {args.num_trials} trials){compare_str}"
         )
 
