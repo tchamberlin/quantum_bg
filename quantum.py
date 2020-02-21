@@ -26,15 +26,12 @@ CARDS = [
 
 
 class Side:
-    def __init__(self, ship_die, cards=None, combat_die=None):
+    def __init__(self, ship_die, cards=None, combat_die_rolls=None):
         if not (1 <= ship_die <= 6):
             raise ValueError(f"ship_die must be between 1 and 6! Got: {ship_die}")
 
-        if combat_die and not (1 <= combat_die <= 6):
-            raise ValueError(f"combat_die must be between 1 and 6! Got: {combat_die}")
-
         self.ship_die = ship_die
-        self.combat_die = combat_die
+        self.combat_die = None
 
         if cards:
             invalid_cards = [card for card in cards if card not in CARDS]
@@ -45,20 +42,35 @@ class Side:
         else:
             self.cards = tuple()
 
+        self.predefined_combat_die_rolls = (
+            combat_die_rolls if combat_die_rolls is not None else []
+        )
+        self.combat_die_rolls = []
+        for combat_die in self.predefined_combat_die_rolls:
+            if not (1 <= combat_die <= 6):
+                raise ValueError(
+                    f"All combat_die_rolls must be between 1 and 6! Got: {combat_die}"
+                )
+
+        self.roll_counter = 0
+        self.combat_log = []
+
     def __repr__(self):
         return f"{self.__class__.__name__}(ship_die={self.ship_die}, combat_die={self.combat_die}, cards={self.cards})"
 
-    def __str__(self):
-        if self.combat_die:
-            string = (
-                f"{self.ship_die}+{self.combat_die}={self.ship_die+ self.combat_die}"
-            )
+    @classmethod
+    def to_string(cls, ship_die, combat_die, cards):
+        if combat_die:
+            string = f"{ship_die}+{combat_die}={ship_die+ combat_die}"
         else:
-            string = f"{self.ship_die}"
+            string = f"{ship_die}"
 
-        if self.cards:
-            string = f"{string} [{', '.join(self.cards)}]"
-        return f"{self.__class__.__name__} {string}"
+        if cards:
+            string = f"{string} [{', '.join(cards)}]"
+        return f"{cls.__name__} {string}"
+
+    def __str__(self):
+        return self.to_string(self.ship_die, self.combat_die, self.cards)
 
     def __eq__(self, die):
         return hash(self) == hash(die)
@@ -67,13 +79,29 @@ class Side:
         return hash((self.ship_die, self.cards, self.combat_die))
 
     def roll(self):
-        self.combat_die = random.randint(1, 6)
-
-    def total(self):
         if "rational" in self.cards:
-            self.combat_die = 3
+            logger.debug("Presence of rational card forces roll of 3!")
+            the_roll = 3
 
+        elif self.predefined_combat_die_rolls:
+            the_roll = self.predefined_combat_die_rolls[self.roll_counter]
+            logger.debug(
+                f"Returning explicitly-defined roll #{self.roll_counter}: {the_roll}"
+            )
+        else:
+            the_roll = random.randint(1, 6)
+
+        self.combat_die = the_roll
+        self.combat_die_rolls.append(the_roll)
+        self.roll_counter += 1
+
+        if not (1 <= the_roll <= 6):
+            raise ValueError(f"Combat die must be between 1 and 6! Got: {the_roll}")
+
+    def total(self, dice_only=False):
         total = self.ship_die + self.combat_die
+        if dice_only:
+            return total
 
         if "ferocious" in self.cards:
             logger.debug("Lowered effective roll by 1 due to Ferocious")
@@ -88,6 +116,19 @@ class Side:
     def reset(self):
         self.combat_die = None
 
+    def history(self):
+        history = []
+        for attacker, defender, attacker_wins in self.combat_log:
+            attacker_ship_die, attacker_combat_die, attacker_total = attacker
+            defender_ship_die, defender_combat_die, defender_total = defender
+            vstring = "Attacker" if attacker_wins else "Defender"
+            history.append(
+                f"{attacker_ship_die}+{attacker_combat_die}={attacker_total} vs. "
+                f"{defender_ship_die}+{defender_combat_die}={defender_total}: {vstring}"
+            )
+
+        return "\n".join(history)
+
 
 class Attacker(Side):
     def recalc(self, attacker, defender, comparator=operator.le):
@@ -97,6 +138,13 @@ class Attacker(Side):
         logger.debug(f"recalc {attacker_total=} {defender_total=}")
         winner, loser = (attacker, defender) if attacker_wins else (defender, attacker)
 
+        self.combat_log.append(
+            (
+                (attacker.ship_die, attacker.combat_die, attacker.total()),
+                (defender.ship_die, defender.combat_die, defender.total()),
+                attacker == winner,
+            )
+        )
         return winner, loser
 
     def attack(self, defender):
@@ -104,10 +152,8 @@ class Attacker(Side):
 
         logger.debug(f"{attacker} attacking {defender}")
 
-        if not attacker.combat_die:
-            attacker.roll()
-        if not defender.combat_die:
-            defender.roll()
+        attacker.roll()
+        defender.roll()
         winner, loser = self.recalc(attacker, defender)
 
         logger.debug(f"{winner=} vs. {loser=}")
@@ -152,6 +198,24 @@ class Attacker(Side):
             if prev_winner != winner:
                 logger.debug("Upset due to Stubborn!")
 
+        if (
+            attacker.predefined_combat_die_rolls
+            and attacker.predefined_combat_die_rolls != attacker.combat_die_rolls
+        ):
+            raise AssertionError(
+                "Attacker predefined_combat_die_rolls "
+                f"{attacker.predefined_combat_die_rolls} don't match actual: "
+                f"{attacker.combat_die_rolls}"
+            )
+        if (
+            defender.predefined_combat_die_rolls
+            and defender.predefined_combat_die_rolls != defender.combat_die_rolls
+        ):
+            raise AssertionError(
+                "Defender predefined_combat_die_rolls "
+                f"{defender.predefined_combat_die_rolls} don't match actual: "
+                f"{defender.combat_die_rolls}"
+            )
         return winner == attacker
 
 
