@@ -1,15 +1,15 @@
 """Take interval-based images from a webcam"""
 
-import argparse
 from datetime import datetime, timedelta
-import logging
-import random
-import math
-import subprocess
 from pathlib import Path
 from pprint import pprint
-import pickle
+import argparse
+import logging
+import math
 import operator
+import pickle
+import random
+import subprocess
 
 
 logger = logging.getLogger(__name__)
@@ -44,6 +44,9 @@ class Side:
             self.cards = tuple(cards)
         else:
             self.cards = tuple()
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(ship_die={self.ship_die}, combat_die={self.combat_die}, cards={self.cards})"
 
     def __str__(self):
         if self.combat_die:
@@ -88,7 +91,10 @@ class Side:
 
 class Attacker(Side):
     def recalc(self, attacker, defender, comparator=operator.le):
-        attacker_wins = comparator(attacker.total(), defender.total())
+        attacker_total = attacker.total()
+        defender_total = defender.total()
+        attacker_wins = comparator(attacker_total, defender_total)
+        logger.debug(f"recalc {attacker_total=} {defender_total=}")
         winner, loser = (attacker, defender) if attacker_wins else (defender, attacker)
 
         return winner, loser
@@ -97,8 +103,11 @@ class Attacker(Side):
         attacker = self
 
         logger.debug(f"{attacker} attacking {defender}")
-        attacker.roll()
-        defender.roll()
+
+        if not attacker.combat_die:
+            attacker.roll()
+        if not defender.combat_die:
+            defender.roll()
         winner, loser = self.recalc(attacker, defender)
 
         logger.debug(f"{winner=} vs. {loser=}")
@@ -153,7 +162,7 @@ class Defender(Side):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--save", type=Path)
-    parser.add_argument("-i", "--compare_to", type=Path)
+    parser.add_argument("-i", "--compare-to", type=Path)
     parser.add_argument("-a", "--attacker-cards", nargs="+", choices=CARDS)
     parser.add_argument(
         "-A", "--attackers", dest="attacker_ship_dice", nargs="+", type=int
@@ -161,6 +170,12 @@ def parse_args():
     parser.add_argument("-d", "--defender-cards", nargs="+", choices=CARDS)
     parser.add_argument(
         "-D", "--defenders", dest="defender_ship_dice", nargs="+", type=int
+    )
+    parser.add_argument(
+        "--rolls",
+        metavar="ATTACKER_SHIP ATTACKER_ROLL DEFENDER_SHIP DEFENDER_ROLL",
+        nargs=4,
+        type=int,
     )
     parser.add_argument("-n", "--num-trials", type=int, default=1000)
 
@@ -221,21 +236,7 @@ def get_results(
     return results
 
 
-def main():
-    args = parse_args()
-    if args.verbose:
-        init_logging(logging.DEBUG)
-    else:
-        init_logging(logging.INFO)
-
-    if args.attacker_cards and args.defender_cards:
-        shared = set(args.attacker_cards).intersection(set(args.defender_cards))
-        if shared:
-            raise ValueError(
-                f"Attacker and defender cannot have the same card! Shared cards: {shared}"
-            )
-    results = {}
-
+def do_stats(args):
     if args.compare_to:
         with open(args.compare_to, "rb") as file:
             logger.debug(f"Loaded base results from {args.compare_to.name}")
@@ -283,6 +284,49 @@ def main():
                 for key, value in results.items()
             }
             pickle.dump(results, file)
+
+
+def do_specific(args):
+    (
+        attacker_ship_die,
+        attacker_combat_die,
+        defender_ship_die,
+        defender_combat_die,
+    ) = args.rolls
+    attacker = Attacker(
+        ship_die=attacker_ship_die,
+        combat_die=attacker_combat_die,
+        cards=args.attacker_cards,
+    )
+    defender = Defender(
+        ship_die=defender_ship_die,
+        combat_die=defender_combat_die,
+        cards=args.defender_cards,
+    )
+
+    res = attacker.attack(defender)
+    print(f"Winner: {attacker if res else defender}")
+
+
+def main():
+    args = parse_args()
+    if args.verbose:
+        init_logging(logging.DEBUG)
+    else:
+        init_logging(logging.INFO)
+
+    if args.attacker_cards and args.defender_cards:
+        shared = set(args.attacker_cards).intersection(set(args.defender_cards))
+        if shared:
+            raise ValueError(
+                f"Attacker and defender cannot have the same card! Shared cards: {shared}"
+            )
+    results = {}
+
+    if args.rolls:
+        do_specific(args)
+    else:
+        do_stats(args)
 
 
 if __name__ == "__main__":
