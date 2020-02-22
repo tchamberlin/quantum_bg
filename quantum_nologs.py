@@ -12,7 +12,7 @@ import random
 import subprocess
 
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 CARDS = [
     "ferocious",
@@ -80,14 +80,10 @@ class Side:
 
     def roll(self):
         if "rational" in self.cards:
-            logger.debug("Presence of rational card forces roll of 3!")
             the_roll = 3
 
         elif self.predefined_combat_die_rolls:
             the_roll = self.predefined_combat_die_rolls[self.roll_counter]
-            logger.debug(
-                f"Returning explicitly-defined roll #{self.roll_counter}: {the_roll}"
-            )
         else:
             the_roll = random.randint(1, 6)
 
@@ -104,11 +100,9 @@ class Side:
             return total
 
         if "ferocious" in self.cards:
-            logger.debug("Lowered effective roll by 1 due to Ferocious")
             total -= 1
 
         if "strategic" in self.cards:
-            logger.debug("Lowered effective roll by 1 due to Strategic")
             total -= 2
 
         return total
@@ -137,7 +131,6 @@ class Attacker(Side):
         attacker_total = attacker.total()
         defender_total = defender.total()
         attacker_wins = comparator(attacker_total, defender_total)
-        logger.debug(f"recalc {attacker_total=} {defender_total=}")
         winner, loser = (attacker, defender) if attacker_wins else (defender, attacker)
 
         self.combat_log.append(
@@ -152,13 +145,9 @@ class Attacker(Side):
     def attack(self, defender):
         attacker = self
 
-        logger.debug(f"{attacker} attacking {defender}")
-
         attacker.roll()
         defender.roll()
         winner, loser = self.recalc(attacker, defender)
-
-        logger.debug(f"{winner=} vs. {loser=}")
 
         # If the LOSER holds Relentless, they can re-roll
         # We assume that the loser will ALWAYS do this, and that the winner
@@ -167,8 +156,6 @@ class Attacker(Side):
             prev_winner = winner
             loser.roll()
             winner, loser = self.recalc(attacker, defender)
-            if prev_winner != winner:
-                logger.debug("Upset due to Relentless!")
 
         # If the ATTACKER holds Scrappy, they can re-roll
         # We assume that, if they lose, they will ALWAYS do this, and that
@@ -177,8 +164,6 @@ class Attacker(Side):
             prev_winner = winner
             loser.roll()
             winner, loser = self.recalc(attacker, defender)
-            if prev_winner != winner:
-                logger.debug("Upset due to Scrappy!")
 
         # If the LOSER holds Cruel, they can force the WINNER to re-roll
         # We assume that they will ALWAYS do this, and that the LOSER will
@@ -187,8 +172,6 @@ class Attacker(Side):
             prev_winner = winner
             winner.roll()
             winner, loser = self.recalc(attacker, defender)
-            if prev_winner != winner:
-                logger.debug("Upset due to Relentless!")
 
         # If the DEFENDER holds Stubborn, then they break ties
         if loser == defender and "stubborn" in defender.cards:
@@ -197,8 +180,6 @@ class Attacker(Side):
             # EQUAL TO, it only wins if it is strictly LESS THAN the defender
             # total
             winner, loser = self.recalc(attacker, defender, comparator=operator.lt)
-            if prev_winner != winner:
-                logger.debug("Upset due to Stubborn!")
 
         if (
             attacker.predefined_combat_die_rolls
@@ -255,19 +236,15 @@ def init_logging(level):
     _logger = logging.getLogger(__name__)
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(logging.Formatter("%(message)s"))
-    _logger.addHandler(console_handler)
-    _logger.setLevel(level)
 
 
 def do_iterations(attacker, defender, num_trials):
     attacker_win_count = 0
-    logger.debug("-" * 80)
     for __ in range(num_trials):
         attacker.reset()
         defender.reset()
         result = attacker.attack(defender)
         attacker_win_count += int(result)
-        logger.debug("-" * 80)
 
     return attacker_win_count
 
@@ -305,7 +282,6 @@ def get_results(
 def do_stats(args):
     if args.compare_to:
         with open(args.compare_to, "rb") as file:
-            logger.debug(f"Loaded base results from {args.compare_to.name}")
             base_results = pickle.load(file)
     else:
         base_results = None
@@ -344,7 +320,6 @@ def do_stats(args):
 
     if args.save:
         with open(args.save, "wb") as file:
-            logger.debug(f"Wrote new results to {args.save.name}")
             results = {
                 (key[0].ship_die, key[1].ship_die): value
                 for key, value in results.items()
