@@ -25,6 +25,18 @@ CARDS = [
 ]
 
 
+def load(path):
+    with open(path, "rb") as file:
+        results = pickle.load(file)
+
+    return results
+
+
+def save(results, path):
+    with open(path, "wb") as file:
+        pickle.dump(results, file, protocol=5)
+
+
 class Side:
     def __init__(self, ship_die, cards=None, combat_die_rolls=None):
         if not (1 <= ship_die <= 6):
