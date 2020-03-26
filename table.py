@@ -5,9 +5,12 @@ import logging
 import pickle
 from pprint import pprint
 
+import dask
+
+from dask.distributed import Client, progress
 from tqdm import tqdm
 
-from quantum_nologs import do_iterations, Attacker, Defender, CARDS
+from quantum_nologs import do_iterations, Attacker, Defender, CARDS, load, save
 
 logger = logging.getLogger(__name__)
 
@@ -16,25 +19,11 @@ def get_possible_hands(available_cards=CARDS):
     return [
         hand
         for num_attacker_cards in range(0, 4)
-        for hand in itertools.permutations(available_cards, num_attacker_cards)
+        for hand in itertools.combinations(available_cards, num_attacker_cards)
     ]
 
 
-def load(path):
-    with open(path, "rb") as file:
-        tqdm.write(f"Read results from {path}")
-        results = pickle.load(file)
-
-    return results
-
-
-def save(results, path):
-    with open(path, "wb") as file:
-        tqdm.write(f"Wrote new results to {path}")
-        pickle.dump(results, file, protocol=5)
-
-
-def get_results(
+def handle_defender_hand(
     num_trials,
     attacker_cards=None,
     defender_cards=None,
@@ -64,28 +53,48 @@ def get_results(
     return results
 
 
+def handle_attacker_hand(attacker_hand, num_trials):
+    # tqdm.write(f"{attacker_hand=}")
+    results = {}
+    possible_defender_cards = [c for c in CARDS if c not in attacker_hand]
+    # tqdm.write(f"{possible_defender_cards=}")
+    possible_defender_hands = get_possible_hands(possible_defender_cards)
+    for defender_hand in possible_defender_hands:
+        current = handle_defender_hand(
+            num_trials=num_trials,
+            attacker_cards=attacker_hand,
+            defender_cards=defender_hand,
+        )
+        results[defender_hand] = current
+
+    save(
+        results,
+        f"attacker_{','.join(attacker_hand) if attacker_hand else 'empty'}.pkl",
+    )
+
+
+def handle_results(execs):
+    print("Done!")
+
+
 def table(num_trials=1, output=None):
+    # threads_per_worker=4, n_workers=1
+    client = Client()
     possible_attacker_hands = get_possible_hands()
 
     results = defaultdict(dict)
 
-    for attacker_hand in tqdm(possible_attacker_hands, unit="attacker_hand"):
-        tqdm.write(f"{attacker_hand=}")
-        possible_defender_cards = [c for c in CARDS if c not in attacker_hand]
-        # tqdm.write(f"{possible_defender_cards=}")
-        possible_defender_hands = get_possible_hands(possible_defender_cards)
-        for defender_hand in tqdm(possible_defender_hands, unit="defender_hand"):
-            # tqdm.write(f"{defender_hand=}")
-            current = get_results(
-                num_trials, attacker_cards=attacker_hand, defender_cards=defender_hand
-            )
-            # results[attacker_hand][defender_hand] = current
-            results[attacker_hand][defender_hand] = current
+    execs = []
 
-        save(
-            results[attacker_hand],
-            f"attacker_{','.join(attacker_hand) if attacker_hand else 'empty'}.pkl",
+    for attacker_hand in set(possible_attacker_hands):
+        result = dask.delayed(handle_attacker_hand)(
+            attacker_hand, num_trials=num_trials
         )
+        execs.append(result)
+
+    # foo = dask.delayed(handle_results)(execs)
+    # foo.visualize()
+    all_results = dask.compute(*execs)
 
 
 def main():
