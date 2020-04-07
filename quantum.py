@@ -9,6 +9,7 @@ import math
 import operator
 import pickle
 import random
+import statistics
 import subprocess
 
 
@@ -318,6 +319,8 @@ def do_stats(args):
         defender_ship_dice=args.defender_ship_dice,
     )
 
+    win_ratios = []
+    base_win_ratios = []
     for key, attacker_win_ratio in results.items():
         attacker, defender = key
         if base_results:
@@ -341,6 +344,14 @@ def do_stats(args):
             f"<{attacker}> wins against <{defender}> "
             f"{attacker_win_ratio:.2%} of the time (over {args.num_trials} trials){compare_str}"
         )
+
+        win_ratios.append(attacker_win_ratio)
+        base_win_ratios.append(attacker_win_ratio_base)
+
+    avg_win_ratio = statistics.mean(win_ratios)
+    avg_base_win_ratio = statistics.mean(base_win_ratios)
+    print(f"{avg_win_ratio:.2%} vs. {avg_base_win_ratio:.2%} "
+        f"({avg_win_ratio - avg_base_win_ratio:.2%} diff from base)")
 
     if args.save:
         with open(args.save, "wb") as file:
