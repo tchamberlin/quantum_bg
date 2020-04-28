@@ -33,7 +33,9 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        attacker_advantage = options["attacker_ship_die"] - options["defender_ship_die"]
+        attacker_ship_die = options["attacker_ship_die"]
+        defender_ship_die = options["defender_ship_die"]
+        attacker_advantage = attacker_ship_die - defender_ship_die
         attacker_hand = Hand.objects.get_by_cards(options["attacker_cards"])
         defender_hand = Hand.objects.get_by_cards(options["defender_cards"])
         encounter = Encounter.objects.get(
@@ -41,4 +43,4 @@ class Command(BaseCommand):
             attacker_hand=attacker_hand,
             defender_hand=defender_hand,
         )
-        print(f"{encounter.attacker_win_ratio}")
+        print(encounter.to_string(attacker_ship_die, defender_ship_die))

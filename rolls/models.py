@@ -19,13 +19,15 @@ class Hand(models.Model):
 
     cards = models.ManyToManyField(Card)
 
+    slug = models.CharField(max_length=128)
+
     objects = HandManager()
 
     def __str__(self):
         if self.cards.exists():
             return f"{', '.join(self.cards.values_list('name', flat=True))}"
 
-        return "Empty"
+        return "No Cards"
 
 
 class Encounter(models.Model):
@@ -79,3 +81,9 @@ class Encounter(models.Model):
 
         return f"{self} <vs. {base.attacker_win_ratio:.2%} base matchup>"
 
+    def to_string(self, attacker_ship_die, defender_ship_die):
+        return (
+            f"Attacker {attacker_ship_die} ({self.attacker_hand}) will win vs. "
+            f"Defender {defender_ship_die} ({self.defender_hand}) "
+            f"{self.attacker_win_ratio:.2%} of the time [adv. {self.attacker_advantage:+}]"
+        )

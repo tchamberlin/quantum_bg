@@ -13,19 +13,6 @@ UNIQUE_ENCOUNTERS = tuple(
 )
 
 
-def get_hand(card_names):
-    cards = Card.objects.filter(name__in=card_names)
-    q = Q()
-    for card in cards:
-        q &= Q(cards=card)
-
-    tqdm.write(f"{card_names=}")
-    return (
-        Hand.objects.annotate(num_cards=Count("cards"))
-        .filter(num_cards=cards.count())
-        .get(q)
-    )
-
 def handle_all_encounters_parallel(num_trials=1000):
     execs = []
 
