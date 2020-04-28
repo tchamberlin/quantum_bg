@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_extensions",
+    "django_tables2",
     "rolls",
 ]
 
@@ -114,3 +115,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = "/static/"
+
+DJANGO_TABLES2_TEMPLATE = "django_tables2/bootstrap4.html"

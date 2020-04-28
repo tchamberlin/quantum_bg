@@ -1,3 +1,8 @@
-from django.shortcuts import render
+from django.views.generic import ListView
 
-# Create your views here.
+from rolls.models import Encounter
+
+
+class EncounterListView(ListView):
+    model = Encounter
+    template_name = 'rolls/encounter_list_view.html'
