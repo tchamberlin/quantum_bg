@@ -15,11 +15,13 @@ from quantum_nologs import do_iterations, Attacker, Defender, CARDS, load, save
 logger = logging.getLogger(__name__)
 
 
-def get_possible_hands(available_cards=CARDS):
+def get_possible_hands(available_cards=None):
+    if available_cards is None:
+        available_cards = CARDS
     return [
         hand
-        for num_attacker_cards in range(0, 4)
-        for hand in itertools.combinations(available_cards, num_attacker_cards)
+        for num_cards in range(0, 4)
+        for hand in itertools.combinations(available_cards, num_cards)
     ]
 
 

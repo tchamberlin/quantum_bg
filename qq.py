@@ -28,16 +28,17 @@ def prob_of_win2(probabilities):
 
     # trials is derived from length of probabilities"""
 
-    return 1 - reduce(operator.mul, probabilities)
+    return 1 - reduce(operator.mul, [1 - p for p in probabilities])
 
 
 def qq(
-    input_path, attacker_ship_die, defender_ship_die, attacker_cards, defender_cards
+    attacker_ship_die, defender_ship_die, attacker_cards, defender_cards, input_path=None
 ):
-    _input_path = (
-        f"attacker_{','.join(attacker_cards) if attacker_cards else 'empty'}.pkl"
-    )
-    results_for_attacker_cards = load(_input_path)
+    if input_path is None:
+        input_path = (
+            f"attacker_{','.join(attacker_cards) if attacker_cards else 'empty'}.pkl"
+        )
+    results_for_attacker_cards = load(input_path)
 
     return results_for_attacker_cards[defender_cards][
         attacker_ship_die, defender_ship_die

@@ -85,7 +85,11 @@ class Side:
             the_roll = 3
 
         elif self.predefined_combat_die_rolls:
-            the_roll = self.predefined_combat_die_rolls[self.roll_counter]
+            try:
+                the_roll = self.predefined_combat_die_rolls[self.roll_counter]
+            except IndexError:
+                # TODO: We can do better than this
+                raise ValueError("You need to give more predifined rolls!")
             logger.debug(
                 f"Returning explicitly-defined roll #{self.roll_counter}: {the_roll}"
             )
@@ -153,7 +157,7 @@ class Attacker(Side):
     def attack(self, defender):
         attacker = self
 
-        logger.debug(f"{attacker} attacking {defender}")
+        logger.debug(f"{attacker=} attacking {defender=}")
 
         attacker.roll()
         defender.roll()
@@ -219,6 +223,12 @@ class Attacker(Side):
                 f"{defender.predefined_combat_die_rolls} don't match actual: "
                 f"{defender.combat_die_rolls}"
             )
+
+        logger.debug(f"{attacker=} vs. {defender=}")
+        logger.debug(f"{winner=} vs. {loser=}")
+
+
+        logger.debug(f"end attack: {winner == attacker=}")
         return winner == attacker
 
 
