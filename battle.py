@@ -24,8 +24,7 @@ def do_fight(attacker_ship_die, defender_ship_die, attacker_cards, defender_card
         cards=defender_cards,
     )
 
-    res = attacker.attack(defender)
-    return res
+    return attacker.attack(defender)
 
 
 def do_battle_win_any(fights, attacker_cards, defender_cards):
@@ -118,8 +117,7 @@ def main():
 
 # TODO: parse 1to6
 def parse_fights(fights_str):
-    fights = [[int(die) for die in fs.split(":")] for fs in fights_str]
-    return fights
+    return [[int(die) for die in fs.split(":")] for fs in fights_str]
 
 
 def parse_args():

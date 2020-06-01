@@ -20,7 +20,7 @@ def get_possible_hands(available_cards=None):
         available_cards = CARDS
     return [
         hand
-        for num_cards in range(0, 4)
+        for num_cards in range(4)
         for hand in itertools.combinations(available_cards, num_cards)
     ]
 

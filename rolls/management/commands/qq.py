@@ -20,8 +20,7 @@ def die_face(die):
 
 
 def parse_fights(fights_str):
-    fights = [[die_face(die) for die in fs.split(":")] for fs in fights_str]
-    return fights
+    return [[die_face(die) for die in fs.split(":")] for fs in fights_str]
 
 
 def battle_summary(fights, attacker_cards, defender_cards, win_condition):
