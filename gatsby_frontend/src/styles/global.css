@@ -1,0 +1,31 @@
+.win-ratio-display {
+  font-size: 2em;
+}
+
+.calc-side {
+  border-width: 1px;
+  border-color: gray;
+  border-style: solid;
+  border-radius: 5px;
+  padding: .8em;
+}
+
+.results {
+    border-radius: 3px;
+    padding: .3em;
+    border-style: solid;
+    border-width: 1px;
+    border-color: gray;
+}
+
+.results-good {
+    background-color: #c7fdb5;
+}
+
+.results-medium {
+    background-color: #ffff84;
+}
+
+.results-bad {
+    background-color: #d9544d;
+}
