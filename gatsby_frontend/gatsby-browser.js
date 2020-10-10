@@ -4,12 +4,16 @@
  * See: https://www.gatsbyjs.com/docs/browser-apis/
  */
 
-// You can delete this file if you're not using it
+import "bootstrap/dist/css/bootstrap.min.css"
+import "katex/dist/katex.min.css"
 import "./src/styles/global.css"
 
 // Used to avoid resetting scroll position in the Quantum Combat Calculator
 export const shouldUpdateScroll = ({ routerProps }) => {
-  if (typeof routerProps.location.state === 'undefined') {
+  if (
+    typeof routerProps.location === "undefined" ||
+    typeof routerProps.location.state === "undefined"
+  ) {
     return true
   }
 

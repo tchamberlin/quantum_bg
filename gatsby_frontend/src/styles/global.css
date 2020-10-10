@@ -7,25 +7,51 @@
   border-color: gray;
   border-style: solid;
   border-radius: 5px;
-  padding: .8em;
+  padding: 0.8em;
+  background-color: white;
 }
 
 .results {
-    border-radius: 3px;
-    padding: .3em;
-    border-style: solid;
-    border-width: 1px;
-    border-color: gray;
+  border-radius: 3px;
+  padding: 0.3em;
+  border-style: solid;
+  border-width: 1px;
+  border-color: gray;
 }
 
 .results-good {
-    background-color: #c7fdb5;
+  background-color: #c7fdb5;
 }
 
 .results-medium {
-    background-color: #ffff84;
+  background-color: #ffff84;
 }
 
 .results-bad {
-    background-color: #d9544d;
+  background-color: #d9544d;
+}
+
+.encounter-group {
+  margin: 5px 0px;
+  background-color: #f8f8ff;
+}
+
+/*.btn-xs {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.7;
+  line-height: 1;
+  border-radius: 0.2rem;
+}
+*/
+
+.close-button {
+  margin-left: 5px;
+}
+
+.toggle-precision {
+  cursor: pointer;
+}
+
+.full-precision {
+  background-color: #f8f8ff;
 }
