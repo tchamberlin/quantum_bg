@@ -178,11 +178,11 @@ class Attacker(Side):
             winner, loser = self.recalc(attacker, defender)
 
         # If the LOSER holds Cruel, they can force the WINNER to re-roll
-        # We assume that they will ALWAYS do this, and that the LOSER will
-        # never do this
+            # We assume that they will ALWAYS do this, and that the LOSER will
+            # never do this
         if "cruel" in loser.cards:
             prev_winner = winner
-            winner.roll()
+            prev_winner.roll()
             winner, loser = self.recalc(attacker, defender)
 
         # If the DEFENDER holds Stubborn, then they break ties
