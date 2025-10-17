@@ -1,7 +1,5 @@
 from unittest.mock import patch
 
-import pytest
-
 from quantum_bg.roll import full_reconfigure
 
 

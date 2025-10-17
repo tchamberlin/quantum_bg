@@ -1,16 +1,11 @@
 """Take interval-based images from a webcam"""
 
-from datetime import datetime, timedelta
-from pathlib import Path
-from pprint import pprint
 import argparse
 import logging
-import math
 import operator
 import pickle
 import random
-import subprocess
-
+from pathlib import Path
 
 # logger = logging.getLogger(__name__)
 

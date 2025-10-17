@@ -1,14 +1,9 @@
 import argparse
-from collections import defaultdict
 import itertools
 import logging
-import pickle
-from pprint import pprint
+from collections import defaultdict
 
-
-from tqdm import tqdm
-
-from quantum_bg.quantum_nologs import do_iterations, Attacker, Defender, CARDS, load, save
+from quantum_bg.quantum_nologs import CARDS, Attacker, Defender, do_iterations, save
 
 logger = logging.getLogger(__name__)
 

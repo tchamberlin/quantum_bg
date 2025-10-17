@@ -1,19 +1,12 @@
 """Take interval-based images from a webcam"""
 
-from datetime import datetime, timedelta
-from functools import reduce
-from pathlib import Path
-from pprint import pprint
-import operator
 import argparse
 import logging
-import math
 import operator
-import pickle
-import random
-import subprocess
+from functools import reduce
+from pathlib import Path
 
-from quantum_bg.quantum import Attacker, Defender, CARDS
+from quantum_bg.quantum import CARDS, Attacker, Defender
 from quantum_bg.table import load
 
 logger = logging.getLogger(__name__)

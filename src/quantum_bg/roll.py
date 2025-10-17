@@ -46,7 +46,7 @@ def reconfigure(
 
     if ship_abilities_remaining > 0 and current_ship_die == 6:
         logger.debug(
-            f"RECONFIGURE: We might be able to get to our target by free reconfigure!"
+            "RECONFIGURE: We might be able to get to our target by free reconfigure!"
         )
         new_ship_die, ship_abilities_remaining = (
             _reconfigure(current_ship_die),
@@ -59,7 +59,7 @@ def reconfigure(
         and current_ship_die == 4
         and desired_ship_die in [3, 5]
     ):
-        logger.debug(f"MODIFY: We can get to our target by modifying!")
+        logger.debug("MODIFY: We can get to our target by modifying!")
         new_ship_die = desired_ship_die
         logger.debug(f"Modified from {current_ship_die} to {desired_ship_die}")
         ship_abilities_remaining -= 1
