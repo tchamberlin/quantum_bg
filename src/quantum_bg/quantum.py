@@ -80,7 +80,7 @@ class Side:
                 the_roll = self.predefined_combat_die_rolls[self.roll_counter]
             except IndexError:
                 # TODO: We can do better than this
-                raise ValueError("You need to give more predifined rolls!")
+                raise ValueError("You need to give more predifined rolls!") from None
             logger.debug(f"Returning explicitly-defined roll #{self.roll_counter}: {the_roll}")
         else:
             the_roll = random.randint(1, 6)
@@ -377,7 +377,6 @@ def main():
         shared = set(args.attacker_cards).intersection(set(args.defender_cards))
         if shared:
             raise ValueError(f"Attacker and defender cannot have the same card! Shared cards: {shared}")
-    results = {}
 
     if args.rolls:
         do_specific(args)

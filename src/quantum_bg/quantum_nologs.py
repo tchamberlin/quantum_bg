@@ -156,7 +156,6 @@ class Attacker(Side):
         # We assume that the loser will ALWAYS do this, and that the winner
         # NEVER will
         if "relentless" in loser.cards:
-            prev_winner = winner
             loser.roll()
             winner, loser = self.recalc(attacker, defender)
 
@@ -164,7 +163,6 @@ class Attacker(Side):
         # We assume that, if they lose, they will ALWAYS do this, and that
         # they never will if they win
         if loser == attacker and "scrappy" in attacker.cards:
-            prev_winner = winner
             loser.roll()
             winner, loser = self.recalc(attacker, defender)
 
@@ -172,13 +170,11 @@ class Attacker(Side):
         # We assume that they will ALWAYS do this, and that the LOSER will
         # never do this
         if "cruel" in loser.cards:
-            prev_winner = winner
             winner.roll()
             winner, loser = self.recalc(attacker, defender)
 
         # If the DEFENDER holds Stubborn, then they break ties
         if loser == defender and "stubborn" in defender.cards:
-            prev_winner = winner
             # So, instead of the attacker winning if it is LESS THAN OR
             # EQUAL TO, it only wins if it is strictly LESS THAN the defender
             # total
@@ -342,7 +338,6 @@ def main():
         shared = set(args.attacker_cards).intersection(set(args.defender_cards))
         if shared:
             raise ValueError(f"Attacker and defender cannot have the same card! Shared cards: {shared}")
-    results = {}
 
     if args.rolls:
         do_specific(args)

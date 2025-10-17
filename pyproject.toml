@@ -67,6 +67,8 @@ ignore = [
   # "E501", # line too long TODO: This really should be removed
   # "NPY002", # https://docs.astral.sh/ruff/rules/numpy-legacy-random/
 ]
+[tool.ruff.lint.per-file-ignores]
+"test_*.py" = ["S101"]  # Allow assert in test files
 
 [tool.ruff.lint.isort]
 combine-as-imports = true

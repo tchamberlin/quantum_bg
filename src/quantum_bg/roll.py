@@ -96,8 +96,8 @@ def main():
     desired_ship_die = args.desired_ship_die
 
     num_success = 0
-    for i in range(args.num_trials):
-        result, actions_remaining, ship_abilities_remaining = full_reconfigure(
+    for _ in range(args.num_trials):
+        result, _actions_remaining, _ship_abilities_remaining = full_reconfigure(
             current_ship_die=current_ship_die,
             desired_ship_die=desired_ship_die,
             ship_abilities_remaining=args.abilities,

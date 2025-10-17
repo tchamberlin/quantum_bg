@@ -29,16 +29,16 @@ class TestNoCards:
         assert not attacker_wins
 
     def test_invalid_ship_die(self):
-        with pytest.raises(ValueError, match="ship_die must be between 1 and 6!*"):
-            a = Attacker(ship_die=7, combat_die_rolls=[1])
-        with pytest.raises(ValueError, match="ship_die must be between 1 and 6!*"):
-            a = Attacker(ship_die=0, combat_die_rolls=[1])
+        with pytest.raises(ValueError, match=r"ship_die must be between 1 and 6!.*"):
+            Attacker(ship_die=7, combat_die_rolls=[1])
+        with pytest.raises(ValueError, match=r"ship_die must be between 1 and 6!.*"):
+            Attacker(ship_die=0, combat_die_rolls=[1])
 
     def test_invalid_combat_die(self):
-        with pytest.raises(ValueError, match="All combat_die_rolls must be between 1 and 6!*"):
-            a = Attacker(ship_die=6, combat_die_rolls=[7])
-        with pytest.raises(ValueError, match="All combat_die_rolls must be between 1 and 6!*"):
-            a = Attacker(ship_die=6, combat_die_rolls=[0])
+        with pytest.raises(ValueError, match=r"All combat_die_rolls must be between 1 and 6!.*"):
+            Attacker(ship_die=6, combat_die_rolls=[7])
+        with pytest.raises(ValueError, match=r"All combat_die_rolls must be between 1 and 6!.*"):
+            Attacker(ship_die=6, combat_die_rolls=[0])
 
 
 class TestCards:

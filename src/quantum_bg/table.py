@@ -1,7 +1,6 @@
 import argparse
 import itertools
 import logging
-from collections import defaultdict
 
 from quantum_bg.quantum_nologs import CARDS, Attacker, Defender, do_iterations, save
 
@@ -69,10 +68,7 @@ def handle_results(execs):
 
 def table(num_trials=1, output=None):
     # threads_per_worker=4, n_workers=1
-    client = Client()
-    possible_attacker_hands = get_possible_hands()
-
-    results = defaultdict(dict)
+    pass
 
 
 def main():

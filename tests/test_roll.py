@@ -5,7 +5,7 @@ from quantum_bg.roll import full_reconfigure
 
 class TestReconfigure:
     def test_nop(self):
-        result, actions_remaining, ship_abilities_remaining = full_reconfigure(
+        result, _actions_remaining, _ship_abilities_remaining = full_reconfigure(
             current_ship_die=1,
             desired_ship_die=1,
             ship_abilities_remaining=1,
@@ -16,7 +16,7 @@ class TestReconfigure:
 
     @patch("quantum_bg.roll.ROLLS", iter([2]))
     def test_3_actions_good_luck(self):
-        result, actions_remaining, ship_abilities_remaining = full_reconfigure(
+        result, _actions_remaining, _ship_abilities_remaining = full_reconfigure(
             current_ship_die=1,
             desired_ship_die=2,
             ship_abilities_remaining=1,
@@ -27,7 +27,7 @@ class TestReconfigure:
 
     @patch("quantum_bg.roll.ROLLS", iter([3, 4, 5]))
     def test_3_actions_bad_luck(self):
-        result, actions_remaining, ship_abilities_remaining = full_reconfigure(
+        result, _actions_remaining, _ship_abilities_remaining = full_reconfigure(
             current_ship_die=1,
             desired_ship_die=2,
             ship_abilities_remaining=1,
@@ -38,7 +38,7 @@ class TestReconfigure:
 
     @patch("quantum_bg.roll.ROLLS", iter([2]))
     def test_0_actions(self):
-        result, actions_remaining, ship_abilities_remaining = full_reconfigure(
+        result, _actions_remaining, _ship_abilities_remaining = full_reconfigure(
             current_ship_die=1,
             desired_ship_die=2,
             ship_abilities_remaining=0,
