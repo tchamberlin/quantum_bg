@@ -6,8 +6,8 @@
 import argparse
 import logging
 
-from quantum import CARDS, Attacker, Defender
-from qq import qq
+from quantum_bg.quantum import CARDS, Attacker, Defender
+from quantum_bg.qq import qq
 
 logger = logging.getLogger(__name__)
 

@@ -1,6 +1,6 @@
 import pytest
 
-from quantum import Attacker, Defender
+from quantum_bg.quantum import Attacker, Defender
 
 
 class TestNoCards:

@@ -356,12 +356,14 @@ def do_stats(args):
         )
 
         win_ratios.append(attacker_win_ratio)
-        base_win_ratios.append(attacker_win_ratio_base)
+        if base_results:
+            base_win_ratios.append(attacker_win_ratio_base)
 
-    avg_win_ratio = statistics.mean(win_ratios)
-    avg_base_win_ratio = statistics.mean(base_win_ratios)
-    print(f"{avg_win_ratio:.2%} vs. {avg_base_win_ratio:.2%} "
-        f"({avg_win_ratio - avg_base_win_ratio:.2%} diff from base)")
+    if base_results:
+        avg_win_ratio = statistics.mean(win_ratios)
+        avg_base_win_ratio = statistics.mean(base_win_ratios)
+        print(f"{avg_win_ratio:.2%} vs. {avg_base_win_ratio:.2%} "
+            f"({avg_win_ratio - avg_base_win_ratio:.2%} diff from base)")
 
     if args.save:
         with open(args.save, "wb") as file:

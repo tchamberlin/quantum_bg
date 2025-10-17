@@ -13,8 +13,8 @@ import pickle
 import random
 import subprocess
 
-from quantum import Attacker, Defender, CARDS
-from table import load
+from quantum_bg.quantum import Attacker, Defender, CARDS
+from quantum_bg.table import load
 
 logger = logging.getLogger(__name__)
 

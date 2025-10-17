@@ -12,62 +12,75 @@ The core combat mechanics involve:
 - Special ability cards that modify outcomes
 - Counterintuitive rule: **Lower total wins**
 
+## Project Setup
+
+This project uses modern Python tooling with uv and src layout:
+
+```bash
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install the package and dependencies
+uv pip install -e .
+
+# Install dev dependencies (includes pytest)
+uv pip install -e ".[dev]"
+```
+
 ## Common Commands
 
 ### Running Simulations
 
 ```bash
-# Basic combat simulation (default 1000 trials)
-python quantum.py -a ferocious -d stubborn -n 10000
+# Using installed entry points (recommended after installation)
+quantum -a ferocious -d stubborn -n 10000
+battle 3:2 4:3 -a scrappy -d rational -w any -n 10000
+qq 4 3 -a strategic -d stubborn -n 5
+roll 2 5 -a 1 -A 3 -n 10000
+table 10000
 
-# Compare results to baseline pickle file
-python quantum.py -a strategic --compare-to base_results.pkl -n 10000
-
-# Save results to pickle file
-python quantum.py -a cruel -d relentless --save results.pkl -n 10000
-
-# Test specific roll outcomes (deterministic)
-python quantum.py --rolls 3 4 2 5 -a cruel -d relentless
+# Or using python -m (works without installation)
+python -m quantum_bg.quantum -a ferocious -d stubborn -n 10000
+python -m quantum_bg.battle 3:2 4:3 -a scrappy -d rational -w any -n 10000
+python -m quantum_bg.qq 4 3 -a strategic -d stubborn -n 5
+python -m quantum_bg.roll 2 5 -a 1 -A 3 -n 10000
+python -m quantum_bg.table 10000
 ```
 
-### Multi-Engagement Battles
+### Common Simulation Options
 
-```bash
-# Battle with multiple engagements (format: attacker:defender)
-python battle.py 3:2 4:3 -a scrappy -d rational -w any -n 10000
+**quantum / quantum-nologs:**
+- Basic: `quantum -a ferocious -d stubborn -n 10000`
+- Compare to baseline: `quantum -a strategic --compare-to base_results.pkl -n 10000`
+- Save results: `quantum -a cruel -d relentless --save results.pkl -n 10000`
+- Test specific rolls: `quantum --rolls 3 4 2 5 -a cruel -d relentless`
 
-# Win conditions:
-#   -w any  = Win at least one engagement
-#   -w all  = Win all engagements
-```
+**battle (multi-engagement):**
+- Win any: `battle 3:2 4:3 -a scrappy -d rational -w any -n 10000`
+- Win all: `battle 3:2 4:3 -a scrappy -d rational -w all -n 10000`
 
-### Pre-computed Probability Lookups
+**table (lookup generation):**
+- Generate: `table 10000` (creates .pkl files)
 
-```bash
-# Generate lookup table (creates .pkl files)
-python table.py 10000
+**qq (query pre-computed):**
+- Query: `qq 4 3 -a strategic -d stubborn -n 5`
 
-# Query pre-computed probabilities from pickle files
-python qq.py 4 3 -a strategic -d stubborn -n 5
-```
-
-### Ship Reconfiguration Probabilities
-
-```bash
-# Calculate probability of reaching desired ship die value
-python roll.py 2 5 -a 1 -A 3 -n 10000
-# Args: current_die desired_die -a abilities -A actions
-```
+**roll (reconfiguration):**
+- Calculate: `roll 2 5 -a 1 -A 3 -n 10000`
+  - Args: current_die desired_die -a abilities -A actions
 
 ### Testing
 
 ```bash
-# Run all tests
+# Run all tests with uv
+uv run pytest
+
+# Or with installed pytest
 pytest
 
 # Run specific test files
-pytest test_quantum.py
-pytest test_roll.py
+pytest tests/test_quantum.py
+pytest tests/test_roll.py
 ```
 
 ## Architecture
@@ -162,16 +175,34 @@ attacker_win_ratio = attacker_win_count / num_trials
 
 ### File Organization
 
-**Core Simulation:**
-- `quantum.py` - Main simulation with logging (use for debugging)
-- `quantum_nologs.py` - Optimized simulation without logging (use for performance)
-- `battle.py` - Multi-engagement battle calculator
-- `roll.py` - Ship reconfiguration probability calculator
+**Project Structure:**
+```
+quantum_bg/
+├── src/
+│   └── quantum_bg/
+│       ├── __init__.py
+│       ├── quantum.py          # Main simulation with logging
+│       ├── quantum_nologs.py   # Optimized simulation (no logging)
+│       ├── battle.py           # Multi-engagement battles
+│       ├── qq.py               # Query pre-computed probabilities
+│       ├── roll.py             # Ship reconfiguration calculator
+│       └── table.py            # Generate lookup tables
+├── tests/
+│   ├── test_quantum.py         # Core simulation tests
+│   └── test_roll.py            # Reconfiguration tests
+└── pyproject.toml              # Project metadata & dependencies
+```
+
+**Core Simulation Modules:**
+- `src/quantum_bg/quantum.py` - Main simulation with logging (debugging)
+- `src/quantum_bg/quantum_nologs.py` - Optimized simulation (performance)
+- `src/quantum_bg/battle.py` - Multi-engagement battle calculator
+- `src/quantum_bg/roll.py` - Ship reconfiguration probability
 
 **Lookup Tables:**
-- `table.py` - Generate pre-computed probability tables (saves to .pkl files)
-- `qq.py` - Query pre-computed probabilities from pickle files
+- `src/quantum_bg/table.py` - Generate pre-computed tables (.pkl files)
+- `src/quantum_bg/qq.py` - Query pre-computed probabilities
 
 **Tests:**
-- `test_quantum.py` - Core combat simulation tests
-- `test_roll.py` - Roll/reconfiguration tests
+- `tests/test_quantum.py` - Core combat simulation tests
+- `tests/test_roll.py` - Roll/reconfiguration tests

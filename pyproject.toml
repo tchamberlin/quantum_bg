@@ -1,0 +1,72 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "quantum-bg"
+version = "0.1.0"
+description = "Monte Carlo probability calculator for board game combat simulations"
+readme = "CLAUDE.md"
+requires-python = ">=3.8"
+authors = [
+    { name = "Your Name", email = "you@example.com" }
+]
+dependencies = [
+    "tqdm>=4.65.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=7.0.0",
+]
+
+[project.scripts]
+quantum = "quantum_bg.quantum:main"
+quantum-nologs = "quantum_bg.quantum_nologs:main"
+battle = "quantum_bg.battle:main"
+qq = "quantum_bg.qq:main"
+roll = "quantum_bg.roll:main"
+table = "quantum_bg.table:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+
+[tool.ruff]
+line-length = 120
+src = ["src", "benchmark", "notebooks"]
+extend-exclude = ["attic", "notebooks/developer", "*.ipynb"]
+
+
+[tool.ruff.lint]
+select = [
+  "F", # https://docs.astral.sh/ruff/rules/pyflakes-f
+  "E", # https://docs.astral.sh/ruff/rules/error-e
+  "W", # https://docs.astral.sh/ruff/rules/warning-w
+  "B", # https://docs.astral.sh/ruff/rules/flake8-bugbear-b
+  "I", # https://docs.astral.sh/ruff/rules/isort-i
+  "NPY", # https://docs.astral.sh/ruff/rules/numpy-specific-rules-npy
+  "PD", # https://docs.astral.sh/ruff/rules/pandas-vet-pd
+  "RUF", # https://docs.astral.sh/ruff/rules/ruff-specific-rules-ruf
+  "UP", # https://docs.astral.sh/ruff/rules/printf-string-formatting/
+  "S101", # https://docs.astral.sh/ruff/rules/assert/
+  "T10", # https://docs.astral.sh/ruff/rules/#flake8-debugger-t10
+  "PLR5501", # https://docs.astral.sh/ruff/rules/collapsible-else-if/
+  "PLR2044", # https://docs.astral.sh/ruff/rules/empty-comment/
+  "G010",
+]
+fixable = ["ALL"]
+ignore = [
+  # "E741",  # ambiguous-variable-name
+  # "RUF002", # ambiguous characters
+  # "RUF052", # dummy var used
+  # "PD015", # TODO: This really should be removed
+  # "E501", # line too long TODO: This really should be removed
+  # "NPY002", # https://docs.astral.sh/ruff/rules/numpy-legacy-random/
+]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true

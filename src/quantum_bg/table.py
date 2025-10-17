@@ -8,7 +8,7 @@ from pprint import pprint
 
 from tqdm import tqdm
 
-from quantum_nologs import do_iterations, Attacker, Defender, CARDS, load, save
+from quantum_bg.quantum_nologs import do_iterations, Attacker, Defender, CARDS, load, save
 
 logger = logging.getLogger(__name__)
 
