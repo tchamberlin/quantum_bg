@@ -5,9 +5,7 @@ import logging
 import pickle
 from pprint import pprint
 
-import dask
 
-from dask.distributed import Client, progress
 from tqdm import tqdm
 
 from quantum_nologs import do_iterations, Attacker, Defender, CARDS, load, save
@@ -85,18 +83,6 @@ def table(num_trials=1, output=None):
     possible_attacker_hands = get_possible_hands()
 
     results = defaultdict(dict)
-
-    execs = []
-
-    for attacker_hand in set(possible_attacker_hands):
-        result = dask.delayed(handle_attacker_hand)(
-            attacker_hand, num_trials=num_trials
-        )
-        execs.append(result)
-
-    # foo = dask.delayed(handle_results)(execs)
-    # foo.visualize()
-    all_results = dask.compute(*execs)
 
 
 def main():
