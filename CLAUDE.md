@@ -20,11 +20,8 @@ This project uses modern Python tooling with uv and src layout:
 # Install uv (if not already installed)
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Install the package and dependencies
-uv pip install -e .
-
-# Install dev dependencies (includes pytest)
-uv pip install -e ".[dev]"
+# Sync venv to lockfile. This will include dev dependencies
+uv sync
 ```
 
 ## Common Commands
@@ -39,18 +36,26 @@ qq 4 3 -a strategic -d stubborn -n 5
 roll 2 5 -a 1 -A 3 -n 10000
 table 10000
 
+# High-performance mode (~2.5x faster, disables debug logging)
+quantum-fast -a ferocious -d stubborn -n 100000
+
 # Or using python -m (works without installation)
 python -m quantum_bg.quantum -a ferocious -d stubborn -n 10000
 python -m quantum_bg.battle 3:2 4:3 -a scrappy -d rational -w any -n 10000
 python -m quantum_bg.qq 4 3 -a strategic -d stubborn -n 5
 python -m quantum_bg.roll 2 5 -a 1 -A 3 -n 10000
 python -m quantum_bg.table 10000
+
+# For maximum performance with python -m, use -O flag
+python -O -m quantum_bg.quantum -a ferocious -d stubborn -n 100000
+python -O -m quantum_bg.table 100000
 ```
 
 ### Common Simulation Options
 
-**quantum / quantum-nologs:**
+**quantum / quantum-fast:**
 - Basic: `quantum -a ferocious -d stubborn -n 10000`
+- Fast mode: `quantum-fast -a ferocious -d stubborn -n 100000` (~2.5x faster)
 - Compare to baseline: `quantum -a strategic --compare-to base_results.pkl -n 10000`
 - Save results: `quantum -a cruel -d relentless --save results.pkl -n 10000`
 - Test specific rolls: `quantum --rolls 3 4 2 5 -a cruel -d relentless`
@@ -75,17 +80,14 @@ python -m quantum_bg.table 10000
 # Run all tests with uv
 uv run pytest
 
-# Or with installed pytest
-pytest
-
 # Run specific test files
-pytest tests/test_quantum.py
-pytest tests/test_roll.py
+uv run pytest tests/test_quantum.py
+uv run pytest tests/test_roll.py
 ```
 
 ## Architecture
 
-### Core Combat Simulation (`quantum.py`, `quantum_nologs.py`)
+### Core Combat Simulation (`quantum.py`)
 
 **Classes:**
 - `Side` - Base class for combat participants with ship_die, combat_die, and ability cards
@@ -108,10 +110,15 @@ pytest tests/test_roll.py
 - **Lower total wins in this game** (counterintuitive!)
 
 **Key Functions:**
-- `do_iterations(attacker, defender, num_trials)` - Main Monte Carlo simulation loop (quantum_nologs.py:253)
+- `do_iterations(attacker, defender, num_trials)` - Main Monte Carlo simulation loop
 - `get_results()` - Run simulations across multiple ship die combinations
 - `Side.roll()` - Dice rolling with card logic
 - `Attacker.attack()` - Full combat resolution
+
+**Performance:**
+- Debug logging is wrapped in `if __debug__:` blocks
+- Use `python -O` flag to disable debugging and get ~2.5x speedup
+- All production tools (table.py, qq.py, battle.py) use quantum.py
 
 ### Monte Carlo Simulation
 
@@ -181,8 +188,7 @@ quantum_bg/
 ├── src/
 │   └── quantum_bg/
 │       ├── __init__.py
-│       ├── quantum.py          # Main simulation with logging
-│       ├── quantum_nologs.py   # Optimized simulation (no logging)
+│       ├── quantum.py          # Core simulation (use python -O for speed)
 │       ├── battle.py           # Multi-engagement battles
 │       ├── qq.py               # Query pre-computed probabilities
 │       ├── roll.py             # Ship reconfiguration calculator
@@ -194,8 +200,7 @@ quantum_bg/
 ```
 
 **Core Simulation Modules:**
-- `src/quantum_bg/quantum.py` - Main simulation with logging (debugging)
-- `src/quantum_bg/quantum_nologs.py` - Optimized simulation (performance)
+- `src/quantum_bg/quantum.py` - Main simulation (optimized with `if __debug__:`)
 - `src/quantum_bg/battle.py` - Multi-engagement battle calculator
 - `src/quantum_bg/roll.py` - Ship reconfiguration probability
 

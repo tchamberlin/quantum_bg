@@ -2,7 +2,7 @@ import argparse
 import itertools
 import logging
 
-from quantum_bg.quantum_nologs import CARDS, Attacker, Defender, do_iterations, save
+from quantum_bg.quantum import CARDS, Attacker, Defender, do_iterations, save
 
 logger = logging.getLogger(__name__)
 

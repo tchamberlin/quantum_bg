@@ -18,11 +18,12 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
 ]
 
 [project.scripts]
 quantum = "quantum_bg.quantum:main"
-quantum-nologs = "quantum_bg.quantum_nologs:main"
+quantum-fast = "quantum_bg.quantum_fast:main"
 battle = "quantum_bg.battle:main"
 qq = "quantum_bg.qq:main"
 roll = "quantum_bg.roll:main"
@@ -33,6 +34,31 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+addopts = [
+    "--cov=quantum_bg",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+
+[tool.coverage.run]
+source = ["src/quantum_bg"]
+omit = [
+    "*/tests/*",
+    "*/__init__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]
+precision = 2
+show_missing = true
 
 
 [tool.ruff]
