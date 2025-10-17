@@ -28,9 +28,7 @@ def _reconfigure(current_ship_die):
     return random.choice([value for value in range(1, 7) if value != current_ship_die])
 
 
-def reconfigure(
-    current_ship_die, desired_ship_die, ship_abilities_remaining, actions_remaining
-):
+def reconfigure(current_ship_die, desired_ship_die, ship_abilities_remaining, actions_remaining):
     new_ship_die = current_ship_die
 
     logger.debug(
@@ -45,20 +43,14 @@ def reconfigure(
         return current_ship_die, ship_abilities_remaining, actions_remaining
 
     if ship_abilities_remaining > 0 and current_ship_die == 6:
-        logger.debug(
-            "RECONFIGURE: We might be able to get to our target by free reconfigure!"
-        )
+        logger.debug("RECONFIGURE: We might be able to get to our target by free reconfigure!")
         new_ship_die, ship_abilities_remaining = (
             _reconfigure(current_ship_die),
             ship_abilities_remaining - 1,
         )
         logger.debug(f"Reconfigured from {current_ship_die} to {new_ship_die}")
 
-    elif (
-        ship_abilities_remaining > 0
-        and current_ship_die == 4
-        and desired_ship_die in [3, 5]
-    ):
+    elif ship_abilities_remaining > 0 and current_ship_die == 4 and desired_ship_die in [3, 5]:
         logger.debug("MODIFY: We can get to our target by modifying!")
         new_ship_die = desired_ship_die
         logger.debug(f"Modified from {current_ship_die} to {desired_ship_die}")
@@ -79,11 +71,12 @@ def reconfigure(
     logger.debug(f"Abilities remaining: {ship_abilities_remaining}")
     logger.debug(f"Actions remaining: {actions_remaining}")
 
-    if (
-        actions_remaining or (new_ship_die == 6 and ship_abilities_remaining)
-    ) and new_ship_die != desired_ship_die:
+    if (actions_remaining or (new_ship_die == 6 and ship_abilities_remaining)) and new_ship_die != desired_ship_die:
         return reconfigure(
-            new_ship_die, desired_ship_die, ship_abilities_remaining, actions_remaining,
+            new_ship_die,
+            desired_ship_die,
+            ship_abilities_remaining,
+            actions_remaining,
         )
 
     return (
@@ -118,9 +111,7 @@ def main():
     print(f"{num_success=} / {args.num_trials=} = {res:.2%}")
 
 
-def full_reconfigure(
-    current_ship_die, desired_ship_die, ship_abilities_remaining, actions_remaining
-):
+def full_reconfigure(current_ship_die, desired_ship_die, ship_abilities_remaining, actions_remaining):
     if current_ship_die == desired_ship_die:
         print("Current and desired ship die values are the same!")
         return True, desired_ship_die, ship_abilities_remaining

@@ -2,7 +2,6 @@
 
 """Determine likelihood of positive outcome in a given series of fights"""
 
-
 import argparse
 import logging
 
@@ -32,9 +31,7 @@ def do_battle_win_any(fights, attacker_cards, defender_cards):
     attacker_wins_battle = False
     attacker_wins_total = 0
     for attacker_ship_die, defender_ship_die in fights:
-        attacker_wins = do_fight(
-            attacker_ship_die, defender_ship_die, attacker_cards, defender_cards
-        )
+        attacker_wins = do_fight(attacker_ship_die, defender_ship_die, attacker_cards, defender_cards)
         if attacker_wins:
             attacker_wins_total += 1
             attacker_wins_battle = True
@@ -46,9 +43,7 @@ def do_battle_win_all(fights, attacker_cards, defender_cards):
     attacker_wins_battle = True
     attacker_wins_total = 0
     for attacker_ship_die, defender_ship_die in fights:
-        attacker_wins = do_fight(
-            attacker_ship_die, defender_ship_die, attacker_cards, defender_cards
-        )
+        attacker_wins = do_fight(attacker_ship_die, defender_ship_die, attacker_cards, defender_cards)
         if attacker_wins:
             attacker_wins_total += 1
         else:

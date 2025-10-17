@@ -38,15 +38,11 @@ class Side:
         else:
             self.cards = tuple()
 
-        self.predefined_combat_die_rolls = (
-            combat_die_rolls if combat_die_rolls is not None else []
-        )
+        self.predefined_combat_die_rolls = combat_die_rolls if combat_die_rolls is not None else []
         self.combat_die_rolls = []
         for combat_die in self.predefined_combat_die_rolls:
             if not (1 <= combat_die <= 6):
-                raise ValueError(
-                    f"All combat_die_rolls must be between 1 and 6! Got: {combat_die}"
-                )
+                raise ValueError(f"All combat_die_rolls must be between 1 and 6! Got: {combat_die}")
 
         self.roll_counter = 0
         self.combat_log = []
@@ -57,7 +53,7 @@ class Side:
     @classmethod
     def to_string(cls, ship_die, combat_die, cards):
         if combat_die:
-            string = f"{ship_die}+{combat_die}={ship_die+ combat_die}"
+            string = f"{ship_die}+{combat_die}={ship_die + combat_die}"
         else:
             string = f"{ship_die}"
 
@@ -85,9 +81,7 @@ class Side:
             except IndexError:
                 # TODO: We can do better than this
                 raise ValueError("You need to give more predifined rolls!")
-            logger.debug(
-                f"Returning explicitly-defined roll #{self.roll_counter}: {the_roll}"
-            )
+            logger.debug(f"Returning explicitly-defined roll #{self.roll_counter}: {the_roll}")
         else:
             the_roll = random.randint(1, 6)
 
@@ -200,19 +194,13 @@ class Attacker(Side):
             if prev_winner != winner:
                 logger.debug("Upset due to Stubborn!")
 
-        if (
-            attacker.predefined_combat_die_rolls
-            and attacker.predefined_combat_die_rolls != attacker.combat_die_rolls
-        ):
+        if attacker.predefined_combat_die_rolls and attacker.predefined_combat_die_rolls != attacker.combat_die_rolls:
             raise AssertionError(
                 "Attacker predefined_combat_die_rolls "
                 f"{attacker.predefined_combat_die_rolls} don't match actual: "
                 f"{attacker.combat_die_rolls}"
             )
-        if (
-            defender.predefined_combat_die_rolls
-            and defender.predefined_combat_die_rolls != defender.combat_die_rolls
-        ):
+        if defender.predefined_combat_die_rolls and defender.predefined_combat_die_rolls != defender.combat_die_rolls:
             raise AssertionError(
                 "Defender predefined_combat_die_rolls "
                 f"{defender.predefined_combat_die_rolls} don't match actual: "
@@ -221,7 +209,6 @@ class Attacker(Side):
 
         logger.debug(f"{attacker=} vs. {defender=}")
         logger.debug(f"{winner=} vs. {loser=}")
-
 
         logger.debug(f"end attack: {winner == attacker=}")
         return winner == attacker
@@ -236,13 +223,9 @@ def parse_args():
     parser.add_argument("-s", "--save", type=Path)
     parser.add_argument("-i", "--compare-to", type=Path)
     parser.add_argument("-a", "--attacker-cards", nargs="+", choices=CARDS)
-    parser.add_argument(
-        "-A", "--attackers", dest="attacker_ship_dice", nargs="+", type=int
-    )
+    parser.add_argument("-A", "--attackers", dest="attacker_ship_dice", nargs="+", type=int)
     parser.add_argument("-d", "--defender-cards", nargs="+", choices=CARDS)
-    parser.add_argument(
-        "-D", "--defenders", dest="defender_ship_dice", nargs="+", type=int
-    )
+    parser.add_argument("-D", "--defenders", dest="defender_ship_dice", nargs="+", type=int)
     parser.add_argument(
         "--rolls",
         metavar="ATTACKER_SHIP ATTACKER_ROLL DEFENDER_SHIP DEFENDER_ROLL",
@@ -285,7 +268,6 @@ def get_results(
     attacker_ship_dice=None,
     defender_ship_dice=None,
 ):
-
     if attacker_ship_dice:
         attacker_ship_dice = [*attacker_ship_dice]
     else:
@@ -329,17 +311,10 @@ def do_stats(args):
     for key, attacker_win_ratio in results.items():
         attacker, defender = key
         if base_results:
-            attacker_win_ratio_base = base_results[
-                (attacker.ship_die, defender.ship_die)
-            ]
+            attacker_win_ratio_base = base_results[(attacker.ship_die, defender.ship_die)]
             # diff_from_base = attacker_win_ratio - attacker_win_ratio_base
-            diff_from_base = (
-                attacker_win_ratio - attacker_win_ratio_base
-            ) / attacker_win_ratio_base
-            compare_str = (
-                f" (vs. {attacker_win_ratio_base:.2%}; {diff_from_base:.2%} "
-                "diff from base)"
-            )
+            diff_from_base = (attacker_win_ratio - attacker_win_ratio_base) / attacker_win_ratio_base
+            compare_str = f" (vs. {attacker_win_ratio_base:.2%}; {diff_from_base:.2%} diff from base)"
         else:
             compare_str = ""
 
@@ -357,16 +332,15 @@ def do_stats(args):
     if base_results:
         avg_win_ratio = statistics.mean(win_ratios)
         avg_base_win_ratio = statistics.mean(base_win_ratios)
-        print(f"{avg_win_ratio:.2%} vs. {avg_base_win_ratio:.2%} "
-            f"({avg_win_ratio - avg_base_win_ratio:.2%} diff from base)")
+        print(
+            f"{avg_win_ratio:.2%} vs. {avg_base_win_ratio:.2%} "
+            f"({avg_win_ratio - avg_base_win_ratio:.2%} diff from base)"
+        )
 
     if args.save:
         with open(args.save, "wb") as file:
             logger.debug(f"Wrote new results to {args.save.name}")
-            results = {
-                (key[0].ship_die, key[1].ship_die): value
-                for key, value in results.items()
-            }
+            results = {(key[0].ship_die, key[1].ship_die): value for key, value in results.items()}
             pickle.dump(results, file)
 
 
@@ -402,9 +376,7 @@ def main():
     if args.attacker_cards and args.defender_cards:
         shared = set(args.attacker_cards).intersection(set(args.defender_cards))
         if shared:
-            raise ValueError(
-                f"Attacker and defender cannot have the same card! Shared cards: {shared}"
-            )
+            raise ValueError(f"Attacker and defender cannot have the same card! Shared cards: {shared}")
     results = {}
 
     if args.rolls:

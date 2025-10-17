@@ -11,11 +11,7 @@ logger = logging.getLogger(__name__)
 def get_possible_hands(available_cards=None):
     if available_cards is None:
         available_cards = CARDS
-    return [
-        hand
-        for num_cards in range(0, 4)
-        for hand in itertools.combinations(available_cards, num_cards)
-    ]
+    return [hand for num_cards in range(0, 4) for hand in itertools.combinations(available_cards, num_cards)]
 
 
 def handle_defender_hand(
@@ -25,7 +21,6 @@ def handle_defender_hand(
     attacker_ship_dice=None,
     defender_ship_dice=None,
 ):
-
     if attacker_ship_dice:
         attacker_ship_dice = [*attacker_ship_dice]
     else:

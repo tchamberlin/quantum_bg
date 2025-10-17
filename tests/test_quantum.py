@@ -35,13 +35,9 @@ class TestNoCards:
             a = Attacker(ship_die=0, combat_die_rolls=[1])
 
     def test_invalid_combat_die(self):
-        with pytest.raises(
-            ValueError, match="All combat_die_rolls must be between 1 and 6!*"
-        ):
+        with pytest.raises(ValueError, match="All combat_die_rolls must be between 1 and 6!*"):
             a = Attacker(ship_die=6, combat_die_rolls=[7])
-        with pytest.raises(
-            ValueError, match="All combat_die_rolls must be between 1 and 6!*"
-        ):
+        with pytest.raises(ValueError, match="All combat_die_rolls must be between 1 and 6!*"):
             a = Attacker(ship_die=6, combat_die_rolls=[0])
 
 
@@ -79,7 +75,11 @@ class TestCards:
         assert attacker_wins
 
     def test_relentless(self):
-        a = Attacker(ship_die=2, combat_die_rolls=[4, 5], cards=["relentless"],)
+        a = Attacker(
+            ship_die=2,
+            combat_die_rolls=[4, 5],
+            cards=["relentless"],
+        )
         d = Defender(ship_die=1, combat_die_rolls=[2])
 
         assert a.cards == ("relentless",)
@@ -89,7 +89,11 @@ class TestCards:
         assert not attacker_wins
 
     def test_scrappy_attacker(self):
-        a = Attacker(ship_die=2, combat_die_rolls=[4, 5], cards=["scrappy"],)
+        a = Attacker(
+            ship_die=2,
+            combat_die_rolls=[4, 5],
+            cards=["scrappy"],
+        )
         d = Defender(ship_die=1, combat_die_rolls=[2])
 
         assert a.cards == ("scrappy",)

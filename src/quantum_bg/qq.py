@@ -24,18 +24,12 @@ def prob_of_win2(probabilities):
     return 1 - reduce(operator.mul, [1 - p for p in probabilities])
 
 
-def qq(
-    attacker_ship_die, defender_ship_die, attacker_cards, defender_cards, input_path=None
-):
+def qq(attacker_ship_die, defender_ship_die, attacker_cards, defender_cards, input_path=None):
     if input_path is None:
-        input_path = (
-            f"attacker_{','.join(attacker_cards) if attacker_cards else 'empty'}.pkl"
-        )
+        input_path = f"attacker_{','.join(attacker_cards) if attacker_cards else 'empty'}.pkl"
     results_for_attacker_cards = load(input_path)
 
-    return results_for_attacker_cards[defender_cards][
-        attacker_ship_die, defender_ship_die
-    ]
+    return results_for_attacker_cards[defender_cards][attacker_ship_die, defender_ship_die]
 
 
 def main():
@@ -48,9 +42,7 @@ def main():
     if args.attacker_cards and args.defender_cards:
         shared = set(args.attacker_cards).intersection(set(args.defender_cards))
         if shared:
-            raise ValueError(
-                f"Attacker and defender cannot have the same card! Shared cards: {shared}"
-            )
+            raise ValueError(f"Attacker and defender cannot have the same card! Shared cards: {shared}")
 
     res = qq(
         args.input,
@@ -64,10 +56,7 @@ def main():
     if not args.trials or args.trials == 1:
         print(f"{attacker} vs. {defender}: {res:.2%}")
     else:
-        print(
-            f"{attacker} vs. {defender}: {res:.2%} "
-            f"({prob_of_win(res, args.trials):.2%} over {args.trials} trials)"
-        )
+        print(f"{attacker} vs. {defender}: {res:.2%} ({prob_of_win(res, args.trials):.2%} over {args.trials} trials)")
 
 
 def parse_args():
