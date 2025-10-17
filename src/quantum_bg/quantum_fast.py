@@ -4,12 +4,12 @@ This module exists to provide a convenient entry point for production use.
 It's equivalent to running: python -O -m quantum_bg.quantum
 """
 
-import sys
 import os
+import sys
 
 if __debug__:
     # Re-execute with optimization flag
-    os.execvp(sys.executable, [sys.executable, '-O'] + sys.argv)
+    os.execvp(sys.executable, [sys.executable, "-O", *sys.argv])
 
 # If we get here, we're already in optimized mode
 from quantum_bg.quantum import main

@@ -294,7 +294,7 @@ class TestCardInteractions:
         d = Defender(ship_die=1, combat_die_rolls=[1])
 
         # Don't provide predefined rolls - rational should force 3
-        attacker_wins = a.attack(d)
+        a.attack(d)
         assert a.combat_die == 3
         assert a.total() == 5  # 2 + 3
 
@@ -319,11 +319,7 @@ class TestMonteCarloSimulation:
 
     def test_get_results_default_dice(self):
         # Test with default dice (1-6 for both)
-        results = get_results(
-            num_trials=10,
-            attacker_cards=None,
-            defender_cards=None
-        )
+        results = get_results(num_trials=10, attacker_cards=None, defender_cards=None)
 
         # Should have 6x6 = 36 combinations
         assert len(results) == 36
@@ -339,7 +335,7 @@ class TestMonteCarloSimulation:
             attacker_cards=["strategic"],
             defender_cards=None,
             attacker_ship_dice=[1, 2],
-            defender_ship_dice=[5, 6]
+            defender_ship_dice=[5, 6],
         )
 
         # Should have 2x2 = 4 combinations
@@ -351,14 +347,14 @@ class TestMonteCarloSimulation:
             attacker_cards=["strategic"],
             defender_cards=["stubborn"],
             attacker_ship_dice=[3],
-            defender_ship_dice=[3]
+            defender_ship_dice=[3],
         )
 
         # Should have just 1 combination
         assert len(results) == 1
 
         # Strategic should give attacker good odds even with stubborn
-        prob = list(results.values())[0]
+        prob = next(iter(results.values()))
         assert 0.0 <= prob <= 1.0
 
 
